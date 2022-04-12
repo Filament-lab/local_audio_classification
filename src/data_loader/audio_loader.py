@@ -10,19 +10,13 @@ from sklearn.preprocessing import LabelEncoder
 
 class AudioLoader:
     @staticmethod
-    def _load_one_audio_file(input_audio_file_path: str, base_folder: str = None):
+    def _load_one_audio_file(input_audio_file_path: str):
         """
         Load audio file
         :param input_audio_file_path: path to input audio file
-        :param base_folder: Base folder if given
         :return audio signal in tuple
         """
         try:
-            # Load mp3
-            if base_folder:
-                input_audio_file_path = os.path.join(
-                    base_folder, input_audio_file_path[:2], input_audio_file_path
-                )
             if str(os.path.split(input_audio_file_path)[1]).lower().endswith(".mp3"):
                 int_audio_data_stereo = np.array(
                     AudioSegment.from_mp3(input_audio_file_path).get_array_of_samples()
@@ -56,22 +50,19 @@ class AudioLoader:
             )
 
     @staticmethod
-    def load_multiple_audio_files(
-        file_path_list: list, base_folder: str = None
-    ) -> np.array:
+    def load_multiple_audio_files(file_path_list: list) -> np.array:
         """
         Get audio chunk from given file path list and return audio as list of numpy array
         :param file_path_list: Target audio file path to load
-                :param base_folder: Base folder if given
         :return Audio data as numpy array
         """
         try:
             # Load audio files
             return np.array(
                 [
-                    AudioLoader._load_one_audio_file(file_path, base_folder)
+                    AudioLoader._load_one_audio_file(file_path)
                     for file_path in tqdm(file_path_list)
-                ]
+                ], dtype=object
             )
         except Exception as err:
             raise DataLoaderException(f"Error while loading multiple audio files {err}")

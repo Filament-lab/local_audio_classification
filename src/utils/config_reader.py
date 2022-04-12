@@ -40,7 +40,8 @@ class ConfigReader:
             self.audio_column_name = str(cfg.get("dataset", "audio_column_name"))
             self.class_column_name = str(cfg.get("dataset", "class_column_name"))
             self.sub_class_column_name = str(cfg.get("dataset", "sub_class_column_name"))
-
+            self.test_rate = float(cfg.get("dataset", "test_rate"))
+            self.shuffle = bool(cfg.getboolean("dataset", "shuffle"))
         except Exception as err:
             raise ConfigException(f"Error while reading parameter for dataset: {err}")
 
