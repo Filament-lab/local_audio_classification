@@ -35,7 +35,7 @@ class LabelLoader:
         label_file_path: str,
         audio_file_column_name: str,
         class_column_name: str,
-        sub_class_column_name: Optional[str] = None,
+        sub_class_column_name: Optional[str] = None
     ) -> pd.DataFrame:
         """
         Load labels from csv file
