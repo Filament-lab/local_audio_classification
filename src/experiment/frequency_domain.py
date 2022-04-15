@@ -1,5 +1,5 @@
 import torch
-from torch.functional import F
+from src.utils.custom_logger import logger
 from src.data_loader.dataset_loader import DatasetLoader
 from src.data_loader.torch_dataset_loader import TorchDatasetLoader
 from src.utils.config_reader import ConfigReader
@@ -24,6 +24,7 @@ class FrequencyDomain:
         3. Train/Test Split
         """
         # 1.1. Load audio files
+        logger.info("Finding data source...")
         audio_file_path_list = self.DL.find_audio_files()
 
         # 1.2. Load label
@@ -31,18 +32,25 @@ class FrequencyDomain:
 
         # 1.3. Find audio files that matches to the labels
         self.label_df = self.DL.match_labels(audio_file_path_list, label_df)
+        self.num_classes = len(self.label_df[self.config.class_column_name].unique())
+        logger.info(f"{self.num_classes} classes found")
+        logger.info(f"{self.label_df[self.config.class_column_name].unique()}")
         self.label_array = LabelEncoder().fit_transform(self.label_df[self.config.class_column_name].to_numpy())
 
         # 1.4. Load audio files
+        logger.info("Loading audio files...")
         audio_array = self.DL.load_audio()
 
         # 2. Apply pre-process
+        logger.info("Applying pre-process...")
         processed_audio_array = self.PR.apply_multiple_with_threading(audio_array)
 
         # 3. Extract feature
+        logger.info("Extracting audio feature...")
         self.feature_array = self.FE.extract_feature(processed_audio_array, "mel_spectrogram")
 
         # 4. Train/Test Split
+        logger.info("Creating dataset...")
         dataset_dict = self.DL.train_test_split(self.feature_array, self.label_array)
 
         # 5. Create dataset loader with TorchDataset format
@@ -52,7 +60,8 @@ class FrequencyDomain:
         self.test_loader = torch.utils.data.DataLoader(TestDataset, batch_size=128, shuffle=self.config.shuffle)
 
         # 6. Select and Build model
-        self.MB.select_model("cnn")
+        logger.info("Training model...")
+        self.MB.select_model("cnn", self.num_classes)
         self.MB.build()
 
     def train(self):

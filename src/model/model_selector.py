@@ -1,8 +1,10 @@
 import torch
-from torch import optim
 from torch import nn
+from torch import optim
 from tqdm import tqdm
+import matplotlib.pyplot as plt
 from src.model.cnn import Net
+
 from src.utils.config_reader import ConfigReader
 from src.utils.custom_error_handler import MLModelException
 
@@ -15,7 +17,7 @@ class ModelSelector:
         :param config: Config Class
         """
         self.config = config
-        self.cnn = Net()
+        self.cnn = Net
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
         # Feature extraction selector
@@ -23,13 +25,13 @@ class ModelSelector:
             "cnn": self.cnn,
         }
 
-    def select_model(self, model_name: str):
+    def select_model(self, model_name: str, num_classes: int):
         """
         Select model from pre-defined model map
         :param model_name: Name of model
         """
         try:
-            self.model = self.model_type_map[model_name]
+            self.model = self.model_type_map[model_name](num_classes)
             return self.model
         except KeyError:
             raise MLModelException(f"Selected model '{model_name}' does not exist")
@@ -43,9 +45,9 @@ class ModelSelector:
         except Exception as err:
             raise MLModelException(f"Error while selecting model: {err}")
 
-    def train(self, train_loader, epoch: int):
+    def train(self, train_loader, epoch: int, visualize: bool = True):
         train_loss, validation_loss = [], []
-        train_acc, validation_acc = [], []
+        train_accuracy, validation_accuracy = [], []
         with tqdm(range(epoch), unit='epoch') as ep:
             ep.set_description('Training')
             # keep track of the running loss
@@ -69,11 +71,30 @@ class ModelSelector:
                     correct += (predictions == labels).sum().item()
                 # append the loss for this epoch
                 train_loss.append(running_loss/len(train_loader))
-                train_acc.append(correct/total)
-                print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
+                train_accuracy.append(correct/total)
+                print('Train Epoch: {} [{}/{} ({:.0f}%)]\tAccuracy: {:.6f}\tLoss: {:.6f}'.format(
                     epoch, batch_idx * len(feature), len(train_loader.dataset),
-                           100. * batch_idx / len(train_loader), loss))
+                           100. * batch_idx / len(train_loader), train_accuracy, loss))
 
+            # Visualize training result
+            # if visualize:
+            #     plt.plot(train_accuracy, '-o')
+            #     # plt.plot(validation_accuracy, '-o')
+            #     plt.xlabel('epoch')
+            #     plt.ylabel('accuracy')
+            #     plt.legend(['Train', 'Validation'])
+            #     plt.title('Train vs Validation Accuracy')
+            #
+            #     plt.show()
+            #
+            #     plt.plot(train_loss,'-o')
+            #     # plt.plot(validation_loss, '-o')
+            #     plt.xlabel('epoch')
+            #     plt.ylabel('losses')
+            #     plt.legend(['Train', 'Valididation'])
+            #     plt.title('Train vs Validation Losses')
+
+            plt.show()
             # TODO: Add validation
             #     model.eval()
             #     running_loss = 0.
@@ -96,7 +117,7 @@ class ModelSelector:
             #     validation_acc.append(correct/total)
 
 
-def test(self, test_loader):
+    def test(self, test_loader):
         self.model.eval()
         correct = 0
         for feature, labels in test_loader:
