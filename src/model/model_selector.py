@@ -42,6 +42,7 @@ class ModelSelector:
         try:
             self.loss_function = nn.CrossEntropyLoss()
             self.optimizer = optim.Adam(self.model.parameters(), lr=0.01, weight_decay=0.0001)
+            self.scheduler = optim.lr_scheduler.StepLR(self.optimizer, step_size=20, gamma=0.1)
         except Exception as err:
             raise MLModelException(f"Error while selecting model: {err}")
 
@@ -51,9 +52,10 @@ class ModelSelector:
         with tqdm(range(epoch), unit='epoch') as ep:
             ep.set_description('Training')
             # keep track of the running loss
-            running_loss = 0.
-            correct, total = 0, 0
             for epoch in ep:
+                self.scheduler.step()
+                correct, total = 0, 0
+                running_loss = 0.
                 for batch_idx, (feature, labels) in enumerate(train_loader):
                     self.optimizer.zero_grad()
                     feature = feature.to(self.device, dtype=torch.float32)
@@ -65,16 +67,16 @@ class ModelSelector:
                     self.optimizer.step()
                     ep.set_postfix(loss=loss.item())
                     running_loss += loss  # add the loss for this batch
-                    # get accuracy
+                    # get prediction class
                     _, predictions = torch.max(output, 1)
                     total += labels.size(0)
                     correct += (predictions == labels).sum().item()
-                # append the loss for this epoch
-                train_loss.append(running_loss/len(train_loader))
-                train_accuracy.append(correct/total)
-                print('Train Epoch: {} [{}/{} ({:.0f}%)]\tAccuracy: {:.6f}\tLoss: {:.6f}'.format(
-                    epoch, batch_idx * len(feature), len(train_loader.dataset),
-                           100. * batch_idx / len(train_loader), train_accuracy, loss))
+
+                epoch_loss = running_loss/len(train_loader)
+                epoch_accuracy = correct/total
+                train_loss.append(epoch_loss)
+                train_accuracy.append(epoch_accuracy)
+                print(f'Train Epoch: {epoch}\tAccuracy: {epoch_accuracy:.6f}\tLoss: {epoch_loss:.6f}')
 
             # Visualize training result
             # if visualize:
@@ -94,7 +96,7 @@ class ModelSelector:
             #     plt.legend(['Train', 'Valididation'])
             #     plt.title('Train vs Validation Losses')
 
-            plt.show()
+            # plt.show()
             # TODO: Add validation
             #     model.eval()
             #     running_loss = 0.

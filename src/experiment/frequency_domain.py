@@ -55,7 +55,7 @@ class FrequencyDomain:
 
         # 5. Create dataset loader with TorchDataset format
         TrainDataset = TorchDatasetLoader(dataset_dict["train_label"], dataset_dict["train_data"])
-        TestDataset = TorchDatasetLoader(dataset_dict["train_label"], dataset_dict["train_data"])
+        TestDataset = TorchDatasetLoader(dataset_dict["test_label"], dataset_dict["test_data"])
         self.train_loader = torch.utils.data.DataLoader(TrainDataset, batch_size=128, shuffle=self.config.shuffle)
         self.test_loader = torch.utils.data.DataLoader(TestDataset, batch_size=128, shuffle=self.config.shuffle)
 

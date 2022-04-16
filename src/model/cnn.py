@@ -35,9 +35,8 @@ class Net(nn.Module):
 
         # Fully connected layer 2
         x = self.fc2(x)
-        x = F.relu(x)
 
         # Softmax
-        x = F.softmax(x)
+        x = F.log_softmax(x)
 
         return x
