@@ -76,7 +76,7 @@ class ModelSelector:
                 epoch_accuracy = correct/total
                 train_loss.append(epoch_loss)
                 train_accuracy.append(epoch_accuracy)
-                print(f'Train Epoch: {epoch}\tAccuracy: {epoch_accuracy:.6f}\tLoss: {epoch_loss:.6f}')
+                print(f'Train Epoch: {epoch+1}\tAccuracy: {epoch_accuracy:.6f}\tLoss: {epoch_loss:.6f}')
 
             # Visualize training result
             # if visualize:
