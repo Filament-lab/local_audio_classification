@@ -20,8 +20,11 @@ class FrequencyDomain:
     def process_dataset(self):
         """
         1. Load audio and label as dataset
-        2. Extract feature from audio
-        3. Train/Test Split
+        2. Apply pre-process to audio
+        3. Select and extract feature from audio
+        4. Train/Test Split
+        5. Create DataSet class to use Torch batch loader
+        6. Select and build ML model
         """
         # 1.1. Load audio files
         logger.info("Finding data source...")
@@ -45,7 +48,7 @@ class FrequencyDomain:
         logger.info("Applying pre-process...")
         processed_audio_array = self.PR.apply_multiple_with_threading(audio_array)
 
-        # 3. Extract feature
+        # 3. Select and extract feature
         logger.info("Extracting audio feature...")
         self.feature_array = self.FE.extract_feature(processed_audio_array, "mel_spectrogram")
 
@@ -59,15 +62,17 @@ class FrequencyDomain:
         self.train_loader = torch.utils.data.DataLoader(TrainDataset, batch_size=128, shuffle=self.config.shuffle)
         self.test_loader = torch.utils.data.DataLoader(TestDataset, batch_size=128, shuffle=self.config.shuffle)
 
-        # 6. Select and Build model
-        logger.info("Training model...")
+        # 6. Select and build model
+        logger.info("Building model...")
         self.MB.select_model("cnn", self.num_classes)
         self.MB.build()
 
     def train(self):
+        logger.info("Training model...")
         self.MB.train(self.train_loader, self.config.num_epochs)
 
     def test(self):
+        logger.info("Testing model...")
         self.MB.test(self.test_loader)
 
 
