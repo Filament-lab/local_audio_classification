@@ -1,48 +1,33 @@
 import os
 import glob
+import torchaudio
 import librosa
 import numpy as np
 from tqdm import tqdm
 from pydub import AudioSegment
 from src.utils.custom_error_handler import DataLoaderException
-from sklearn.preprocessing import LabelEncoder
+# from sklearn.preprocessing import LabelEncoders
 
 
 class AudioLoader:
     @staticmethod
-    def _load_one_audio_file(input_audio_file_path: str):
+    def _load_one_audio_file(input_audio_file_path: str, resampling_rate: int=None) -> np.ndarray:
         """
         Load audio file
         :param input_audio_file_path: path to input audio file
-        :return audio signal in tuple
+        :param resampling_rate: Sample rate to be re-sampled
+        :return audio signal as numpy ndarray
         """
         try:
-            if str(os.path.split(input_audio_file_path)[1]).lower().endswith(".mp3"):
-                int_audio_data_stereo = np.array(
-                    AudioSegment.from_mp3(input_audio_file_path).get_array_of_samples()
-                )
-                int_audio_data_mono = int_audio_data_stereo[
-                    :: AudioSegment.from_mp3(input_audio_file_path).channels
-                ]
-                audio_data = [
-                    int_audio_data_mono.astype(np.float32, order="C") / 32768.0
-                ]
-            # Load mp4
-            elif str(os.path.split(input_audio_file_path)[1]).lower().endswith(".mp4"):
-                int_audio_data_stereo = np.array(
-                    AudioSegment.from_file(
-                        input_audio_file_path, "m4a"
-                    ).get_array_of_samples()
-                )
-                int_audio_data_mono = int_audio_data_stereo[
-                    :: AudioSegment.from_file(input_audio_file_path).channels
-                ]
-                audio_data = [
-                    int_audio_data_mono.astype(np.float32, order="C") / 32768.0
-                ]
-            # Load everything else
-            else:
-                audio_data, sampling_rate = librosa.load(input_audio_file_path)
+            # Load audio with torchaudio
+            audio_data, sampling_rate = torchaudio.load(input_audio_file_path)
+            # audio_data_librosa, sampling_rate = librosa.load(input_audio_file_path)
+
+            # Apply re-sampling
+            if resampling_rate:
+                resampler = torchaudio.transforms.Resample(orig_freq=sampling_rate, new_freq=resampling_rate)
+                audio_data = resampler(audio_data)
+
             return audio_data
         except Exception as err:
             raise DataLoaderException(

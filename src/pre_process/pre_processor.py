@@ -1,5 +1,6 @@
 import math
 import numpy as np
+from torch import Tensor
 from tqdm import tqdm
 from typing import List
 import multiprocessing as mp
@@ -154,12 +155,12 @@ class PreProcess:
               apply_window: bool = False,
               time_augmentation_set: set = None):
         # Convert to numpy array
-        if isinstance(audio_signal, list):
+        if isinstance(audio_signal, list) or isinstance(audio_signal, Tensor):
             audio_signal = np.array(audio_signal)
 
         # Convert n-channel to mono
-        if audio_signal.ndim == 2:
-            audio_signal = audio_signal[:, 0]
+        if audio_signal.ndim >= 2:
+            audio_signal = audio_signal[0]
 
         # Zero padding if audio signal is longer than maximum seconds
         if zero_padding and len(audio_signal) < self.cfg.max_signal_second * self.cfg.sample_rate:
