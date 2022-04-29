@@ -11,4 +11,4 @@
 ![alt text](assets/dataset.png)
 
 ## 3. Run experiment
-`python src/experiment/frequency_domain.py`
+`python src/experiment/frequency_domain_experiment.py`
