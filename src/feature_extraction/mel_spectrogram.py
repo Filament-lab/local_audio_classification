@@ -14,8 +14,8 @@ class MelSpectrogram(BaseFeature):
 
     def apply(self,
               audio_data,
-              log_scale: bool = False,
-              normalize: bool = False,
+              log_scale: bool = True,
+              normalize: bool = True,
               visualize: bool = False):
         """
         Extract Mel-spectrogram from one audio

@@ -72,7 +72,6 @@ class ConfigReader:
             self.fft_size = int(cfg.get("feature_extraction", "fft_size"))
             self.feature = str(cfg.get("feature_extraction", "feature"))
             self.normalize_spectrogram = bool(cfg.getboolean("feature_extraction", "normalize_spectrogram"))
-            self.normalize_feature = bool(cfg.getboolean("feature_extraction", "normalize_feature"))
 
         except Exception as err:
             raise ConfigException(f"Error while reading parameter for feature extraction: {err}")
@@ -86,7 +85,5 @@ class ConfigReader:
             self.model_name = str(cfg.get("classifier", "model_name"))
             self.num_epochs = int(cfg.get("classifier", "num_epochs"))
             self.model_folder_path = str(cfg.get("classifier", "model_folder_path"))
-            self.bias_initialize_weight = bool(cfg.getboolean("classifier", "bias_initialize_weight"))
-            self.class_weight = bool(cfg.getboolean("classifier", "class_weight"))
         except Exception as err:
             raise ConfigException(f"Error while reading parameter for classifier: {err}")

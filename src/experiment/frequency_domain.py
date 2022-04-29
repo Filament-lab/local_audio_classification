@@ -1,4 +1,5 @@
 import torch
+import numpy as np
 from src.utils.custom_logger import logger
 from src.data_loader.dataset_loader import DatasetLoader
 from src.data_loader.torch_dataset_loader import TorchDatasetLoader
@@ -35,10 +36,15 @@ class FrequencyDomain:
 
         # 1.3. Find audio files that matches to the labels
         self.label_df = self.DL.match_labels(audio_file_path_list, label_df)
-        self.num_classes = len(self.label_df[self.config.class_column_name].unique())
+        self.classes = self.label_df[self.config.class_column_name].unique()
+        self.num_classes = len(self.classes)
         logger.info(f"{self.num_classes} classes found")
         logger.info(f"{self.label_df[self.config.class_column_name].unique()}")
-        self.label_array = LabelEncoder().fit_transform(self.label_df[self.config.class_column_name].to_numpy())
+        self.encoder = LabelEncoder()
+        self.encoder.fit(self.label_df[self.config.class_column_name].unique())
+        self.label_array = self.encoder.transform(self.label_df[self.config.class_column_name].to_numpy())
+        unique, counts = np.unique(self.label_array, return_counts=True)
+        logger.info(dict(zip(self.encoder.classes_, counts)))
 
         # 1.4. Load audio files
         logger.info("Loading audio files...")
@@ -64,7 +70,7 @@ class FrequencyDomain:
 
         # 6. Select and build model
         logger.info("Building model...")
-        self.MB.select_model("cnn", self.num_classes)
+        self.MB.select_model("cnn", self.classes)
         self.MB.build()
 
     def train(self):
@@ -73,7 +79,7 @@ class FrequencyDomain:
 
     def test(self):
         logger.info("Testing model...")
-        self.MB.test(self.test_loader)
+        self.MB.test(test_loader=self.test_loader, show_confusion_matrix=True)
 
 
 if __name__ == "__main__":
