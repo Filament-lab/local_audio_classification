@@ -101,6 +101,44 @@ class DatasetLoader:
         dataset_dict["test_label"] = test_label
         return dataset_dict
 
+    def custom_train_test_split(self, feature_array: np.array, label_array: np.array = None) -> dict:
+        """
+        Take all data and label as input. Split into train/test dataset.
+        :param feature_array: extracted feature in 2D numpy array or 3D numpy array
+        :param label_array: Labels as numpy array
+        """
+        # Split data placeholder
+        dataset_dict = {"train_data": None,
+                        "train_label": None,
+                        "validation_data": None,
+                        "validation_label": None,
+                        "test_data": None,
+                        "test_label": None}
+
+
+        # Split dataset into train and test
+        train_data, test_data, train_label, test_label = train_test_split(feature_array,
+                                                                          label_array,
+                                                                          test_size=self.config.test_rate,
+                                                                          shuffle=self.config.shuffle,
+                                                                          stratify=label_array)
+
+        # Split dataset into train and validation
+        train_data, validation_data, train_label, validation_label = train_test_split(train_data,
+                                                                                      train_label,
+                                                                                      test_size=self.config.validation_rate,
+                                                                                      shuffle=self.config.shuffle,
+                                                                                      stratify=train_label)
+
+        # Store each split
+        dataset_dict["train_data"] = train_data
+        dataset_dict["train_label"] = train_label
+        dataset_dict["validation_data"] = validation_data
+        dataset_dict["validation_label"] = validation_label
+        dataset_dict["test_data"] = test_data
+        dataset_dict["test_label"] = test_label
+        return dataset_dict
+
 
 if __name__ == "__main__":
     # Read config

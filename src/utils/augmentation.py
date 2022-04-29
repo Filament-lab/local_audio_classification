@@ -1,82 +1,9 @@
 import json
 import pickle
-import requests
 import librosa
 import numpy as np
 import random
 from sklearn.model_selection import train_test_split
-from src.utils.custom_error_handler import DataFormatException
-
-
-def normalize_array(array: np.array,
-                    array_mean: float = None,
-                    array_std: float = None,
-                    array_max: float = None,
-                    array_min: float = None):
-    """
-    Normalize the input numpy array from -1 to 1
-    :param array: Frequency domain labels
-    :param array_mean: Mean value (if pre-defined)
-    :param array_std: Std value (if pre-defined)
-    :param array_max: Max value (if pre-defined)
-    :param array_min: Min value (if pre-defined)
-    :return: Normalized labels
-    """
-    # Calculate mean and standard deviation if not given
-    if not array_mean and not array_std:
-        array_mean, array_std = np.mean(array), np.std(array)
-    array = (array - array_mean) / array_std
-
-    # Calculate max and min if not given
-    if not array_max and not array_min:
-        array_min = np.min(array)
-        array_max = np.max(array)
-    return 2 * (array - array_min) / (array_max - array_min) - 1
-
-
-def custom_train_test_split(feature_array: np.array, test_size: float, label_array: np.array = None):
-    """
-    Take all data and label as input. Split into train/test dataset.
-    :param  feature_array: extracted feature in 2D numpy array or 3D numpy array
-    :param test_size: Test size 0 < x < 1
-    :param label_array: Labels as numpy array
-    """
-    # Split placeholder
-    dataset_dict = {"training_annotation": None,
-                    "test_annotation": None,
-                    "validation_annotation": None}
-
-    # Split dataset
-    if label_array is not None:
-        training_annotations, validation_annotations, _, _ = train_test_split(feature_array,
-                                                                              label_array,
-                                                                              test_size=test_size,
-                                                                              stratify=label_array)
-    else:
-        training_annotations, validation_annotations = train_test_split(feature_array, test_size=test_size)
-
-    # Store each split
-    dataset_dict["training_annotation"] = training_annotations
-    dataset_dict["test_annotation"] = validation_annotations
-    dataset_dict["validation_annotation"] = validation_annotations
-    return dataset_dict
-
-
-def binary_to_float(audio_binary: bytearray) -> np.array:
-    """
-    Convert binary audio data into floating numpy array
-    Args:
-        audio (np.array): Audio binary data
-
-    Returns:
-        (np.array): Audio array
-    """
-    return pickle.loads(audio_binary)
-
-
-def dict2json(output_file_path: str, input_dictionary: dict):
-    with open(output_file_path, 'w') as fh:
-        json.dump(input_dictionary, fh)
 
 
 def gaussian_noise(audio_array: np.array, randomize_factor: float = None) -> np.array:
@@ -153,29 +80,4 @@ def normalize_signal(audio_signal: np.array):
     except ZeroDivisionError:
         audio_signal = audio_signal + np.finfo(float).eps
         return audio_signal - np.mean(audio_signal)
-
-
-def custom_noise(audio_array: np.array, noise_sha_list: list):
-    """
-    Add custom noise randomly picked from the given noise list
-    :param audio_array: Input audio array
-    :param noise_sha_list: List of sha
-    :return: Audio signal with custom noise added
-    """
-    # Random factor and select sha
-    random_factor = np.random.uniform(0.01, 0.1)
-    selected_sha = random.sample(noise_sha_list, 1)[0]
-
-    # Randomly select sha
-    noise_audio_chunk = load_audio(host, selected_sha)
-    noise_audio_chunk = normalize_signal(noise_audio_chunk)
-
-    if len(noise_audio_chunk) >= len(audio_array):
-        noise_audio_chunk = noise_audio_chunk[:len(audio_array)]
-    else:
-        noise_audio_chunk = zero_pad(noise_audio_chunk, len(audio_array))
-
-    # Add noise
-    audio_array = audio_array + noise_audio_chunk * random_factor
-    return audio_array / max(abs(audio_array[:]))
 

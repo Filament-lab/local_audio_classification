@@ -5,7 +5,7 @@ from tqdm import tqdm
 from typing import List
 import multiprocessing as mp
 from src.utils.multi_process import chunk_list
-from src.utils.augmentation import gaussian_noise, time_shift, time_stretch, pitch_shift, custom_noise
+from src.utils.augmentation import gaussian_noise, time_shift, time_stretch, pitch_shift
 from src.utils.config_reader import ConfigReader
 from src.utils.custom_error_handler import PreProcessException
 
@@ -118,18 +118,6 @@ class PreProcess:
             windowed_array.append(np.hamming(window_size) * array)
         return np.array(windowed_array)
 
-    # def augment_time(self, audio_signal: np.array, time_augmentation_set: set):
-    #     """
-    #     Apply time-domain data augmentation
-    #     :param audio_signal: Time domain audio signal as numpy array
-    #     :return: augmented audio chunk array
-    #     """
-    #     augmented_audio_array = [audio_signal]
-    #     # Apply each augmentation
-    #     for augmentation in time_augmentation_set:
-    #         augmented_audio_array.append(self.augmentation_functions[augmentation](audio_signal))
-    #
-    #     return np.array(augmented_audio_array)
 
     def augment_time(self, audio_signal: np.array, time_augmentation_set: set):
         """

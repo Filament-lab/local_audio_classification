@@ -2,7 +2,7 @@ import numpy as np
 from torch.utils.data import Dataset
 
 
-class TorchDatasetLoader(Dataset):
+class TorchDataset(Dataset):
     def __init__(self, label_array: np.ndarray, feature_array: np.array):
         self.label_array = label_array
         self.feature_array = feature_array

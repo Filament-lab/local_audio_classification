@@ -8,12 +8,12 @@ from typing import List
 import seaborn as sn
 import matplotlib.pyplot as plt
 from sklearn.metrics import confusion_matrix
-from src.model.cnn import PiczakCnn
+from src.model.piczak_cnn import PiczakCnn
 from src.utils.config_reader import ConfigReader
 from src.utils.custom_error_handler import MLModelException
 
 
-class ModelSelector:
+class ModelTrainer:
     def __init__(self, config: ConfigReader):
         """
         Model selection wrapper
@@ -138,7 +138,7 @@ class ModelSelector:
         if output_file_path:
             plt.savefig(output_file_path)
 
-    def test(self, test_loader, show_confusion_matrix: bool=False):
+    def test(self, test_loader, show_confusion_matrix: bool = False):
         self.model.eval()
         correct = 0
         all_predictions = []

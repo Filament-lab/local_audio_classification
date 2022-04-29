@@ -2,21 +2,21 @@ import torch
 import numpy as np
 from src.utils.custom_logger import logger
 from src.data_loader.dataset_loader import DatasetLoader
-from src.data_loader.torch_dataset_loader import TorchDatasetLoader
+from src.data_loader.torch_dataset_creator import TorchDataset
 from src.utils.config_reader import ConfigReader
 from src.pre_process.pre_processor import PreProcess
-from src.feature_extraction.feature_selector import FeatureExtractor
-from src.model.model_selector import ModelSelector
+from src.feature_extraction.feature_extractor import FeatureExtractor
+from src.model.model_trainer import ModelTrainer
 from sklearn.preprocessing import LabelEncoder
 
 
-class FrequencyDomain:
+class FrequencyDomainExperiment:
     def __init__(self, config: ConfigReader):
         self.config = config
         self.DL = DatasetLoader(self.config)
         self.PR = PreProcess(self.config)
         self.FE = FeatureExtractor(self.config)
-        self.MB = ModelSelector(self.config)
+        self.MT = ModelTrainer(self.config)
 
     def process_dataset(self):
         """
@@ -25,13 +25,12 @@ class FrequencyDomain:
         3. Select and extract feature from audio
         4. Train/Test Split
         5. Create DataSet class to use Torch batch loader
-        6. Select and build ML model
         """
-        # 1.1. Load audio files
+        # 1.1. Find all audio files
         logger.info("Finding data source...")
         audio_file_path_list = self.DL.find_audio_files()
 
-        # 1.2. Load label
+        # 1.2. Load label from csv
         label_df = self.DL.load_label()
 
         # 1.3. Find audio files that matches to the labels
@@ -56,30 +55,30 @@ class FrequencyDomain:
 
         # 3. Select and extract feature
         logger.info("Extracting audio feature...")
-        self.feature_array = self.FE.extract_feature(processed_audio_array, "mel_spectrogram")
+        self.feature_array = self.FE.extract_feature(processed_audio_array, self.config.feature)
 
         # 4. Train/Test Split
         logger.info("Creating dataset...")
         dataset_dict = self.DL.train_test_split(self.feature_array, self.label_array)
 
         # 5. Create dataset loader with TorchDataset format
-        TrainDataset = TorchDatasetLoader(dataset_dict["train_label"], dataset_dict["train_data"])
-        TestDataset = TorchDatasetLoader(dataset_dict["test_label"], dataset_dict["test_data"])
-        self.train_loader = torch.utils.data.DataLoader(TrainDataset, batch_size=128, shuffle=self.config.shuffle)
-        self.test_loader = torch.utils.data.DataLoader(TestDataset, batch_size=128, shuffle=self.config.shuffle)
+        TrainDataset = TorchDataset(dataset_dict["train_label"], dataset_dict["train_data"])
+        TestDataset = TorchDataset(dataset_dict["test_label"], dataset_dict["test_data"])
+        self.train_loader = torch.utils.data.DataLoader(TrainDataset, batch_size=self.config.batch_size, shuffle=self.config.shuffle)
+        self.test_loader = torch.utils.data.DataLoader(TestDataset, batch_size=self.config.batch_size, shuffle=self.config.shuffle)
 
-        # 6. Select and build model
+    def build_model(self):
         logger.info("Building model...")
-        self.MB.select_model("cnn", self.classes)
-        self.MB.build()
+        self.MT.select_model("cnn", self.classes)
+        self.MT.build()
 
-    def train(self):
+    def train_model(self):
         logger.info("Training model...")
-        self.MB.train(self.train_loader, self.config.num_epochs)
+        self.MT.train(self.train_loader, self.config.num_epochs)
 
-    def test(self):
+    def test_model(self):
         logger.info("Testing model...")
-        self.MB.test(test_loader=self.test_loader, show_confusion_matrix=True)
+        self.MT.test(test_loader=self.test_loader, show_confusion_matrix=True)
 
 
 if __name__ == "__main__":
@@ -87,13 +86,16 @@ if __name__ == "__main__":
     CFG = ConfigReader("drums")
 
     # Initialize experiment class
-    FD = FrequencyDomain(CFG)
+    Experiment = FrequencyDomainExperiment(CFG)
 
     # Process dataset
-    FD.process_dataset()
+    Experiment.process_dataset()
+
+    # Build model
+    Experiment.build_model()
 
     # Train model
-    FD.train()
+    Experiment.train_model()
 
     # Test model
-    FD.test()
+    Experiment.test_model()
