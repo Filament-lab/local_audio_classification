@@ -128,10 +128,13 @@ class ModelTrainer:
     def _confusion_matrix(self, label: np.ndarray, predictions: np.ndarray, classes: List[str], output_file_path: str = None):
         # Build confusion matrix
         cf_matrix = confusion_matrix(label, predictions)
-        df_cm = pd.DataFrame(cf_matrix/np.sum(cf_matrix)*len(classes), index=[cl for cl in classes],
+        df_cm = pd.DataFrame(cf_matrix/np.sum(cf_matrix, axis=1),
+                             index=[cl for cl in classes],
                              columns=[cl for cl in classes])
         plt.figure()
-        sn.heatmap(df_cm, annot=True)
+        sn.heatmap(df_cm,
+                   annot=True,
+                   fmt='.2%', cmap='Blues')
         plt.show()
 
         # Save as file
