@@ -12,10 +12,10 @@
 
 ## 3. Train model
 For training model on main classes  
-`python src/experiment/frequency_domain_experiment_main_class.py`  
+`python -m src.experiment.frequency_domain_main_class`  
 
 For training model on sub classes  
-`python src/experiment/frequency_domain_experiment_sub_class.py`
+`python -m src.experiment.frequency_domain_sub_class`
 
 # How to contribute
 ## Branch rule
