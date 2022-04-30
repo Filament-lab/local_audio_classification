@@ -1,5 +1,6 @@
 import torch
 import numpy as np
+from src.experiment.base import BaseExperiment
 from src.utils.custom_logger import logger
 from src.data_loader.dataset_loader import DatasetLoader
 from src.data_loader.torch_dataset_creator import TorchDataset
@@ -10,8 +11,9 @@ from src.model.model_trainer import ModelTrainer
 from sklearn.preprocessing import LabelEncoder
 
 
-class FrequencyDomainExperiment:
+class FrequencyDomainMainClassExperiment(BaseExperiment):
     def __init__(self, config: ConfigReader):
+        super().__init__()
         self.config = config
         self.DL = DatasetLoader(self.config)
         self.PR = PreProcess(self.config)
@@ -59,34 +61,46 @@ class FrequencyDomainExperiment:
 
         # 4. Train/Test Split
         logger.info("Creating dataset...")
-        dataset_dict = self.DL.train_test_split(self.feature_array, self.label_array)
+        dataset_dict = self.DL.train_val_test_split(self.feature_array, self.label_array)
 
         # 5. Create dataset loader with TorchDataset format
         TrainDataset = TorchDataset(dataset_dict["train_label"], dataset_dict["train_data"])
+        ValidationDataset = TorchDataset(dataset_dict["validation_label"], dataset_dict["validation_data"])
         TestDataset = TorchDataset(dataset_dict["test_label"], dataset_dict["test_data"])
         self.train_loader = torch.utils.data.DataLoader(TrainDataset, batch_size=self.config.batch_size, shuffle=self.config.shuffle)
+        self.validation_loader = torch.utils.data.DataLoader(ValidationDataset, batch_size=self.config.batch_size, shuffle=self.config.shuffle)
         self.test_loader = torch.utils.data.DataLoader(TestDataset, batch_size=self.config.batch_size, shuffle=self.config.shuffle)
 
     def build_model(self):
+        """
+        Select and build ML model
+        """
         logger.info("Building model...")
         self.MT.select_model("cnn", self.classes)
         self.MT.build()
 
     def train_model(self):
+        """
+        Train model
+        """
         logger.info("Training model...")
-        self.MT.train(self.train_loader, self.config.num_epochs)
+        self.MT.train(self.train_loader, self.validation_loader, self.config.num_epochs, visualize=True)
 
     def test_model(self):
+        """
+        Test model
+        :return:
+        """
         logger.info("Testing model...")
         self.MT.test(test_loader=self.test_loader, show_confusion_matrix=True)
 
 
 if __name__ == "__main__":
     # Read config file
-    CFG = ConfigReader("drums")
+    CFG = ConfigReader("mel_spectrogram")
 
     # Initialize experiment class
-    Experiment = FrequencyDomainExperiment(CFG)
+    Experiment = FrequencyDomainMainClassExperiment(CFG)
 
     # Process dataset
     Experiment.process_dataset()

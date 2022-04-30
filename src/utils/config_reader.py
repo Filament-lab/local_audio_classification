@@ -41,6 +41,7 @@ class ConfigReader:
             self.class_column_name = str(cfg.get("dataset", "class_column_name"))
             self.sub_class_column_name = str(cfg.get("dataset", "sub_class_column_name"))
             self.test_rate = float(cfg.get("dataset", "test_rate"))
+            self.validation_rate = float(cfg.get("dataset", "validation_rate"))
             self.batch_size = int(cfg.get("dataset", "batch_size"))
             self.shuffle = bool(cfg.getboolean("dataset", "shuffle"))
         except Exception as err:

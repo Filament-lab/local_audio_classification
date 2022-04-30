@@ -4,7 +4,10 @@ from torch.functional import F
 
 class PiczakCnn(nn.Module):
     def __init__(self, num_classes: int):
-        """Intitalize neural net layers"""
+        """
+        Initialize layers
+        :param num_classes: Number of classes for output layer
+        """
         super(PiczakCnn, self).__init__()
         self.conv1 = nn.Conv2d(in_channels=1, out_channels=80, kernel_size=(57, 6), stride=(1, 1), padding=0)
         self.conv2 = nn.Conv2d(in_channels=80, out_channels=80, kernel_size=(1, 3), stride=(1, 1), padding=0)

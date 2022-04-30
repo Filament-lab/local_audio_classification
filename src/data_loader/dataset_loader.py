@@ -101,7 +101,7 @@ class DatasetLoader:
         dataset_dict["test_label"] = test_label
         return dataset_dict
 
-    def custom_train_test_split(self, feature_array: np.array, label_array: np.array = None) -> dict:
+    def train_val_test_split(self, feature_array: np.array, label_array: np.array = None) -> dict:
         """
         Take all data and label as input. Split into train/test dataset.
         :param feature_array: extracted feature in 2D numpy array or 3D numpy array
@@ -114,7 +114,6 @@ class DatasetLoader:
                         "validation_label": None,
                         "test_data": None,
                         "test_label": None}
-
 
         # Split dataset into train and test
         train_data, test_data, train_label, test_label = train_test_split(feature_array,
