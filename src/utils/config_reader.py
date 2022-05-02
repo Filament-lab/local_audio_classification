@@ -85,6 +85,7 @@ class ConfigReader:
         try:
             self.model_name = str(cfg.get("classifier", "model_name"))
             self.num_epochs = int(cfg.get("classifier", "num_epochs"))
+            self.learning_rate = float(cfg.get("classifier", "learning_rate"))
             self.model_folder_path = str(cfg.get("classifier", "model_folder_path"))
         except Exception as err:
             raise ConfigException(f"Error while reading parameter for classifier: {err}")

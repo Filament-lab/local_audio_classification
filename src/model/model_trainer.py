@@ -54,7 +54,7 @@ class ModelTrainer:
             self.loss_function = nn.CrossEntropyLoss()
 
             # TODO: Make these configurable
-            self.optimizer = optim.Adam(self.model.parameters(), lr=0.01, weight_decay=0.0001)
+            self.optimizer = optim.Adam(self.model.parameters(), lr=self.config.learning_rate, weight_decay=0.0001)
             self.scheduler = optim.lr_scheduler.StepLR(self.optimizer, step_size=20, gamma=0.1)
         except Exception as err:
             raise MLModelException(f"Error while selecting model: {err}")
@@ -182,7 +182,7 @@ class ModelTrainer:
         """
         # Build confusion matrix
         cf_matrix = confusion_matrix(label, predictions)
-        df_cm = pd.DataFrame(cf_matrix/np.sum(cf_matrix, axis=1),
+        df_cm = pd.DataFrame(cf_matrix.astype('float') / cf_matrix.sum(axis=1)[:, np.newaxis],
                              index=[cl for cl in classes],
                              columns=[cl for cl in classes])
         print(df_cm)
