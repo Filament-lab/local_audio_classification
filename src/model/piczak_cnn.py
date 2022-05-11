@@ -12,7 +12,7 @@ class PiczakCnn(nn.Module):
         self.conv1 = nn.Conv2d(in_channels=1, out_channels=80, kernel_size=(57, 6), stride=(1, 1), padding=0)
         self.conv2 = nn.Conv2d(in_channels=80, out_channels=80, kernel_size=(1, 3), stride=(1, 1), padding=0)
         self.flatten1 = nn.Flatten()
-        self.fc1 = nn.Linear(in_features=4000, out_features=128)
+        self.fc1 = nn.Linear(in_features=8240, out_features=128)
         self.fc2 = nn.Linear(in_features=128, out_features=num_classes)
         self.dropout = nn.Dropout(p=0.3, inplace=False)
         self.num_classes = num_classes

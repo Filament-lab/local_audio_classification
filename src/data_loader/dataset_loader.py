@@ -49,11 +49,12 @@ class DatasetLoader:
         # Match audio with labels
         logger.info(f"{len(label_df)} files to be matched")
         matched_df = label_df.loc[label_df[self.config.audio_column_name].isin(file_names)]
-
+        not_matched_df = label_df.loc[~label_df[self.config.audio_column_name].isin(file_names)]
         if len(matched_df) == 0:
             assert "Failed to match labels with audio file names"
 
         logger.info(f"{len(matched_df)} audio files matched with labels")
+        not_matched_df.to_csv("not_matched_files.csv", index=False)
 
         # Update audio file path list with only matched file paths
         for matched_audio_file_name in matched_df["audio_file"]:
