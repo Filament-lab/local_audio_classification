@@ -32,7 +32,7 @@ Branch contains hotfix for existing features.
 ## Existing experiments
 Here is the list of the experiments.
 
-| Script                                     | Feature           | Model | Config               | Test Accuracy |  
-| -------------------------------------------| ----------------  | ----- | -------------------- | ------------- | 
-| `frequency_domain_main_class.py`           | Mel-spectrogram   | CNN   | frequency_domain.ini | |
-| `frequency_domain_sub_class.py`            | Mel-spectrogram   | CNN   | frequency_domain.ini | |
+| Script                                     | Feature           | Model | Config               | Test Accuracy | Run Date |
+| -------------------------------------------| ----------------  | ----- | -------------------- | ------------- | -------- |
+| `frequency_domain_main_class.py`           | Mel-spectrogram   | CNN   | frequency_domain.ini |73%            |2022-09-01|
+| `frequency_domain_sub_class.py`            | Mel-spectrogram   | CNN   | frequency_domain.ini |67%            |2022-09-01|
