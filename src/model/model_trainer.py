@@ -189,7 +189,7 @@ class ModelTrainer:
         plt.figure()
         sn.heatmap(df_cm,
                    annot=True,
-                   fmt='.2%',
+                   fmt='.2f',
                    cmap='Blues')
         plt.show()
 
