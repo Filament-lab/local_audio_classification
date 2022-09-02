@@ -182,7 +182,7 @@ class ModelTrainer:
         """
         # Build confusion matrix
         cf_matrix = confusion_matrix(label, predictions)
-        df_cm = pd.DataFrame(cf_matrix/np.sum(cf_matrix, axis=1),
+        df_cm = pd.DataFrame(cf_matrix.astype('float') / cf_matrix.sum(axis=1)[:, np.newaxis],
                              index=[cl for cl in classes],
                              columns=[cl for cl in classes])
         print(df_cm)
