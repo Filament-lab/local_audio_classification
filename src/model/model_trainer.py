@@ -9,6 +9,7 @@ import seaborn as sn
 import matplotlib.pyplot as plt
 from sklearn.metrics import confusion_matrix
 from src.model.piczak_cnn import PiczakCnn
+from src.model.alexnet import AlexNet
 from src.utils.config_reader import ConfigReader
 from src.utils.custom_error_handler import MLModelException
 
@@ -21,12 +22,14 @@ class ModelTrainer:
         :param config: Config Class
         """
         self.config = config
-        self.cnn = PiczakCnn
+        self.piczakcnn = PiczakCnn
+        self.alexnet= AlexNet
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
         # Model type selector
         self.model_type_map = {
-            "cnn": self.cnn,
+            "piczakcnn": self.piczakcnn,
+            "alexnet": self.alexnet,
         }
 
     def select_model(self, model_name: str, classes: np.array):

@@ -11,6 +11,14 @@
 ![alt text](assets/dataset.png)
 
 ## 3. Train model
+Select model in Config file mel_spectogram.ini: <br />
+**[classifier] - > model_name** <br />
+| Available Models  |
+| ------------------| 
+| alexnet           |
+| piczakcnn         |
+
+
 For training model on main classes  
 `python -m src.experiment.frequency_domain_main_class`  
 
@@ -32,7 +40,14 @@ Branch contains hotfix for existing features.
 ## Existing experiments
 Here is the list of the experiments.
 
-| Script                                     | Feature           | Model | Config               | Test Accuracy | Run Date |
-| -------------------------------------------| ----------------  | ----- | -------------------- | ------------- | -------- |
-| `frequency_domain_main_class.py`           | Mel-spectrogram   | CNN   | frequency_domain.ini |73%            |2022-09-01|
-| `frequency_domain_sub_class.py`            | Mel-spectrogram   | CNN   | frequency_domain.ini |67%            |2022-09-01|
+| Script                                     | Feature           | Model | Config               | Result        | Result   |Heat Matrix |Run Date |
+| -------------------------------------------| ----------------  | ----- | -------------------- | ------------- | -------- |--------    |--------  |
+| `frequency_domain_main_class.py`           | Mel-spectrogram   | AlexNet| frequency_domain.ini|![alt text](https://github.com/Filament-lab/local_audio_classification/blob/feature/alexnet_model/assets/model_results/alexnet/Training_Validation_Alexnet_2022-11-05.png)|![alt text](https://github.com/Filament-lab/local_audio_classification/blob/feature/alexnet_model/assets/model_results/alexnet/Training_Validation_Alexnet2_2022-11-05.png)|![alt text](https://github.com/Filament-lab/local_audio_classification/blob/feature/alexnet_model/assets/model_results/alexnet/Training_validation_Alexnet_2022-11-05_HeatMatrix.png)|2022-11-05|
+| `frequency_domain_main_class.py`           | Mel-spectrogram   | Piczak CNN| frequency_domain.ini|![alt text](https://github.com/Filament-lab/local_audio_classification/blob/feature/alexnet_model/assets/model_results/piczakcnn/Training_Validation_PiczakCNN_2022-11-05.png)|![alt text](https://github.com/Filament-lab/local_audio_classification/blob/feature/alexnet_model/assets/model_results/piczakcnn/Training_Validation_PiczakCNN2_2022-11-05.png)|![alt text](https://github.com/Filament-lab/local_audio_classification/blob/feature/alexnet_model/assets/model_results/piczakcnn/Training_Validation_PiczakCNN_2022-11-05_HeatMatrix.png)|2022-11-05|
+
+
+
+
+
+
+
