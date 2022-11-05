@@ -76,7 +76,7 @@ class FrequencyDomainSubClassExperiment(BaseExperiment):
         Select and build ML model
         """
         logger.info("Building model...")
-        self.MT.select_model("cnn", self.classes)
+        self.MT.select_model(self.config.model_name, self.classes)
         self.MT.build()
 
     def train_model(self):
